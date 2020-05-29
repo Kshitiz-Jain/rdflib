@@ -615,60 +615,130 @@ class Graph(Node):
         self.remove((subject, predicate, None))
         self.add((subject, predicate, object_))
 
-    def subjects(self, predicate=None, object=None, uniqueLimit =-1):
+    def subjects(self, predicate=None, object=None, uniqueLimit =0):
         """A generator of subjects with the given predicate and object"""
-        if (uniqueLimit != -1):
-            uniqueSub = dict()
-        for s, p, o in self.triples((None, predicate, object)):
-            if(uniqueLimit==-1):
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((None, predicate, object)):
                 yield s
-            elif(len(uniqueSub)<uniqueLimit and s not in uniqueSub):
-                uniqueSub[s]=True
-                yield s
-            elif(s not in uniqueSub):
-                yield s
+        else:
+            uniqueSub = set()
+            for s, p, o in self.triples((None, predicate, object)):
+                if(len(uniqueSub)<uniqueLimit and s not in uniqueSub):
+                    uniqueSub.add(s)
+                    yield s
+                elif(s not in uniqueSub):
+                    yield s
 
-    def predicates(self, subject=None, object=None, uniqueLimit =-1):
+
+    def predicates(self, subject=None, object=None, uniqueLimit =0):
         """A generator of predicates with the given subject and object"""
-        if (uniqueLimit != -1):
-            uniquePred = dict()
-        for s, p, o in self.triples((subject, None, object)):
-            if(uniqueLimit==-1):
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((subject, None, object)):
                 yield p
-            elif(len(uniquePred)<uniqueLimit and p not in uniquePred):
-                uniquePred[p]=True
-                yield p
-            elif(p not in uniquePred):
-                yield p
+        else:
+            uniquePred=set()
+            for s, p, o in self.triples((subject, None, object)):
+                if(len(uniquePred)<uniqueLimit and p not in uniquePred):
+                    uniquePred.add(p)
+                    yield p
+                elif(p not in uniquePred):
+                    yield p
 
-    def objects(self, subject=None, predicate=None, uniqueLimit=-1):
+
+    def objects(self, subject=None, predicate=None, uniqueLimit=0):
         """A generator of objects with the given subject and predicate"""
-        if (uniqueLimit != -1):
-            uniqueObj = dict()
-        for s, p, o in self.triples((subject, predicate, None)):
-            if(uniqueLimit==-1):
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((subject, predicate, None)):
                 yield o
-            elif(len(uniqueObj)<uniqueLimit and o not in uniqueObj):
-                uniqueObj[o]=True
-                yield o
-            elif(o not in uniqueObj):
-                yield o
+        else:
+            uniqueObj=set()
+            for s, p, o in self.triples((subject, predicate, None)):
+                if(len(uniqueObj)<uniqueLimit and o not in uniqueObj):
+                    uniqueObj.add(o)
+                    yield o
+                elif(o not in uniqueObj):
+                    yield o
 
 
-    def subject_predicates(self, object=None):
+    def subject_predicates(self, object=None, uniqueLimit=0):
         """A generator of (subject, predicate) tuples for the given object"""
-        for s, p, o in self.triples((None, None, object)):
-            yield s, p
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((None, None, object)):
+                yield s,p
+        else:
+            unique=dict()
+            size=0
+            for s, p, o in self.triples((None, None, object)):
+                print(size)
+                print(unique)
+                if(size<uniqueLimit):
+                    if(s not in unique):
+                        unique[s]=set({p})
+                        size+=1
+                        yield s,p
+                    elif(p not in unique[s]):
+                        unique[s].add(p)
+                        size+=1
+                        yield s,p
+                elif(s not in unique):
+                    yield s,p
+                elif(s in unique and p not in unique[s]):
+                    yield s,p
 
-    def subject_objects(self, predicate=None):
+        # for s, p, o in self.triples((None, None, object)):
+        #     yield s, p
+
+    def subject_objects(self, predicate=None, uniqueLimit=0):
         """A generator of (subject, object) tuples for the given predicate"""
-        for s, p, o in self.triples((None, predicate, None)):
-            yield s, o
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((None, predicate, None)):
+                yield s,o
+        else:
+            unique=dict()
+            size=0
+            for s, p, o in self.triples((None, predicate, None)):
+                if(size<uniqueLimit):
+                    if(s not in unique):
+                        unique[s]=set({o})
+                        size+=1
+                        yield s,o
+                    elif(o not in unique[s]):
+                        unique[s].add(o)
+                        size+=1
+                        yield s,o
+                elif(s not in unique):
+                    yield s,o
+                elif(s in unique and o not in unique[s]):
+                    yield s,o
 
-    def predicate_objects(self, subject=None):
+        # for s, p, o in self.triples((None, predicate, None)):
+        #     yield s, o
+
+    def predicate_objects(self, subject=None, uniqueLimit=0):
         """A generator of (predicate, object) tuples for the given subject"""
-        for s, p, o in self.triples((subject, None, None)):
-            yield p, o
+        if(uniqueLimit<=0):
+            for s, p, o in self.triples((subject, None, None)):
+                yield p,o
+        else:
+            unique=dict()
+            size=0
+            for s, p, o in self.triples((subject, None, None)):
+                if(size<uniqueLimit):
+                    if(p not in unique):
+                        unique[p]=set({o})
+                        size+=1
+                        yield p,o
+                    elif(o not in unique[p]):
+                        unique[p].add(o)
+                        size+=1
+                        yield p,o
+                elif(p not in unique):
+                    yield p,o
+                elif(p in unique and o not in unique[p]):
+                    yield p,o
+
+        # for s, p, o in self.triples((subject, None, None)):
+        #     yield p, o
 
     def triples_choices(self, triple, context=None):
         subject, predicate, object_ = triple
