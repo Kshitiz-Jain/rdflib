@@ -685,8 +685,6 @@ class Graph(Node):
                 elif(s in unique and p not in unique[s]):
                     yield s,p
 
-        # for s, p, o in self.triples((None, None, object)):
-        #     yield s, p
 
     def subject_objects(self, predicate=None, uniqueLimit=0):
         """A generator of (subject, object) tuples for the given predicate"""
@@ -711,9 +709,6 @@ class Graph(Node):
                 elif(s in unique and o not in unique[s]):
                     yield s,o
 
-        # for s, p, o in self.triples((None, predicate, None)):
-        #     yield s, o
-
     def predicate_objects(self, subject=None, uniqueLimit=0):
         """A generator of (predicate, object) tuples for the given subject"""
         if(uniqueLimit<=0):
@@ -737,8 +732,6 @@ class Graph(Node):
                 elif(p in unique and o not in unique[p]):
                     yield p,o
 
-        # for s, p, o in self.triples((subject, None, None)):
-        #     yield p, o
 
     def triples_choices(self, triple, context=None):
         subject, predicate, object_ = triple
